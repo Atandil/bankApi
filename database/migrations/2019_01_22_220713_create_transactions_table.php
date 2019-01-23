@@ -19,8 +19,6 @@ class CreateTransactionsTable extends Migration
             $table->integer('customer_id');
             $table->date('date');
 
-            $table->timestamps();
-
             $table->foreign('customer_id')->references('id')->on('customers');
         });
     }

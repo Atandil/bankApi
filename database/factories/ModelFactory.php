@@ -17,3 +17,26 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
         'email' => $faker->email,
     ];
 });
+
+/**
+ * Factory definition for model App\Customer.
+ */
+$factory->define(App\Customer::class, function (Faker\Generator $faker) {
+    return [
+        'name' => $faker->name,
+        'cnp' => rand(100,100000),
+    ];
+});
+
+/**
+ * Factory definition for model App\Transaction.
+ */
+$factory->define(App\Transaction::class, function (Faker\Generator $faker) {
+    $customers = App\Customer::pluck('id')->toArray();
+
+    return [
+        'amount' => $faker->randomFloat(2),
+        'date'    => $faker ->date(),
+        'customer_id' => $faker->randomElement($customers)
+    ];
+});

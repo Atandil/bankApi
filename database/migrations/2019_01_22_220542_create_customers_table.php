@@ -13,11 +13,12 @@ class CreateCustomersTable extends Migration
      */
     public function up()
     {
-        Schema::create('customers', function (Blueprint $table) {
+        Schema::create('customers', function(Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
-            $table->integer('cnp');
-            $table->timestamps();
+            $table->string('name', 100)->unique();
+            $table->integer('cnp')->nullable();
+            // Constraints declaration
+
         });
     }
 

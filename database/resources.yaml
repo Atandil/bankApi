@@ -1,0 +1,26 @@
+Customer:
+  hasMany: transactions
+  fields:
+    name:
+      schema: string:100 unique
+      rules: required|min:3
+      tags: fillable
+    cnp:
+      schema: integer  nullable
+      tags: fillable
+Transaction:
+  belongsTo: customer
+  fields:
+    customer_id:
+      schema: integer unsigned
+      rules: required numeric
+      tags: fillable key
+    date:
+      schema: date
+      rules: date
+      tags: date fillable
+    ammount:
+      schema: decimal
+      rules: numeric
+      tags: fillable
+  add: timestamps softDeletes

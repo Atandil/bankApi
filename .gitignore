@@ -3,8 +3,8 @@
 Homestead.json
 Homestead.yaml
 .env
-.lock
+*.lock
 .editorconfig
-.sqlite
+database.sqlite
 
 
