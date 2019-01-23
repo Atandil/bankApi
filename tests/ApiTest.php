@@ -1,5 +1,5 @@
 <?php
-
+use App\Transaction;
 
 class ApiTest extends TestCase
 {
@@ -13,7 +13,11 @@ class ApiTest extends TestCase
     {
         parent::setUp();
         $this->artisan('migrate');
-        //$this->artisan('db:seed');
+        Transaction::create(['customer_id'=>1,'date'=>'2019-01-02','amount'=>10.53]);
+        Transaction::create(['customer_id'=>1,'date'=>'2019-01-02','amount'=>10.53]);
+        Transaction::create(['customer_id'=>1,'date'=>'2019-01-03','amount'=>10.53]);
+        Transaction::create(['customer_id'=>1,'date'=>'2019-01-02','amount'=>110.53]);
+        $this->artisan('db:seed');
     }
 
     public function tearDown()
@@ -31,11 +35,8 @@ class ApiTest extends TestCase
     {
         $this->json('POST', '/customer', ['name' => 'Sally', 'cnp' => 123213123]);
         $this->seeStatusCode(200);
-
-        //dd($this->response->getContent());
-
         $this->seeJson([
-                'customerId' => 1
+                'customerId' => 6
             ]);
 
     }
@@ -43,16 +44,80 @@ class ApiTest extends TestCase
       /* ● getting a transaction:
         ○ Request: customerId, transactionId
         ○ Response: transactionId, amount, date
+      */
+
+    public function testGetTransaction()
+    {
+        $this->json('GET', '/transaction/1/1');
+        $this->seeStatusCode(201);
+        $this->seeJsonStructure([
+            'transactionId',
+            'amount',
+            'date'
+
+        ]);
+
+
+    }
+
+      /*
         ● getting transaction by filters:
+        dd($this->response->getContent());
         ○ Request: customerId, amount, date, offset, limit
         ○ Response: an array of transactions
-        ● adding a transaction:
+      */
+
+    public function testGetFilteredTransactions()
+    {
+        $this->json('GET', '/transaction/filter/1',['amount'=>'10.53','date'=>'2019-01-02','offset'=>0,'limit'=>2]);
+        dd($this->response->getContent());
+
+       // $this->seeStatusCode(201);
+        /*$this->seeJsonStructure([
+            'transactionId',
+            'amount',
+            'date'
+
+        ]);*/
+
+
+    }
+      /*  ● adding a transaction:
         ○ Request: customerId, amount
-        ○ Response: transactionId, customerId, amount, date
+        ○ Response: transactionId, customerId, amount, date*/
+    public function testAddTransaction()
+    {
+        $this->json('POST', '/transaction', ['customerId' => 1, 'amount'=>10.23]);
+        dd($this->response->getContent());
+        $this->seeJsonStructure([
+            'transactionId',
+            'customerId',
+            'amount',
+            'date'
+
+        ]);
+
+    }
+      /*
         ● updating a transaction:
         ○ Request: transactionId, amount
-        ○ Response: transactionId, customerId, amount, date
-        ● deleting a transaction:
+        ○ Response: transactionId, customerId, amount, date*/
+    public function testEditTransaction()
+    {
+        //$this->json('PUT', '/transaction/1', ['amount'=>444.88]);
+        $this->put('/transaction/1', ['amount'=>444.88],[]);
+        dd($this->response->getContent());
+        $this->seeJsonStructure([
+            'transactionId',
+            'customerId',
+            'amount',
+            'date'
+
+        ]);
+
+    }
+
+      /*  ● deleting a transaction:
         ○ Request: trasactionId
         ○ Response: success/fail
      */
