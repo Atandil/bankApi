@@ -26,8 +26,9 @@ $router->post('customer', 'CustomersController@add');
 /**
  * Routes for resource transaction
  */
-$router->get('transaction/{customerId}/{transactionId}', 'TransactionsController@get');
-$router->get('transaction/{customerId}/{date}/{offset}/{limit}', 'TransactionsController@getFilter');
+$router->get('transaction/{customerId}/{transactionId}', 'TransactionsController@get');;
+//$router->get('transaction/{customerId}/{date}/{offset}/{limit}', 'TransactionsController@getFilter');
 $router->post('transaction', 'TransactionsController@add');
-$router->put('transaction/{transactionId}', 'TransactionsController@put');
+$router->put('transaction/{transactionId}', 'TransactionsController@udate');
 $router->delete('transaction/{transactionId}', 'TransactionsController@remove');
+

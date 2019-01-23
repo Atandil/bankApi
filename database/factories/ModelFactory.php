@@ -36,7 +36,7 @@ $factory->define(App\Transaction::class, function (Faker\Generator $faker) {
 
     return [
         'amount' => $faker->randomFloat(2),
-        'date'    => $faker ->date(),
+        'date'    => $faker ->date("Y-m-d"),
         'customer_id' => $faker->randomElement($customers)
     ];
 });
