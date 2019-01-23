@@ -26,9 +26,17 @@ $router->post('customer', 'CustomersController@add');
 /**
  * Routes for resource transaction
  */
+//Retrieve information GET
 $router->get('transaction/{customerId}/{transactionId}', 'TransactionsController@get');;
 //$router->get('transaction/{customerId}/{date}/{offset}/{limit}', 'TransactionsController@getFilter');
+
+//Add NEW
 $router->post('transaction', 'TransactionsController@add');
-$router->put('transaction/{transactionId}', 'TransactionsController@udate');
+
+//change whole (or create) PUT
+//change only one field PATCH  (can be not safe)
+$router->patch('transaction/{transactionId}', 'TransactionsController@updateAmount');
+
+//remove entity DELETE
 $router->delete('transaction/{transactionId}', 'TransactionsController@remove');
 

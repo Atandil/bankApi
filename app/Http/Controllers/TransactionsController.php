@@ -52,17 +52,22 @@ class TransactionsController extends Controller {
         return response()->json(self::jsonArray($transaction), $statusCode);
     }
 
-    public function update(Request $request, $transactionId)
+    public function updateAmount(Request $request, $transactionId)
     {
         try {
+            $this->validate(
+                $request, [
+                    'amount' => 'required|numeric'
+                ]
+            );
             $transaction = Transaction::findOrFail($transactionId);
             $transaction->update($request->only('amount'));
         } catch(\Exception $e) {
-            $transaction = null;
+            $transaction = $transaction = $e->getMessage();
             $statusCode = 404;
         }
         return response(
-            $this->jsonArray($transaction), $statusCode ?? 200
+            self::jsonArray($transaction), $statusCode ?? 200
         );
     }
 

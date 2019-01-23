@@ -129,14 +129,29 @@ class ApiTest extends TestCase
     public function testEditTransaction()
     {
         //$this->json('PUT', '/transaction/1', ['amount'=>444.88]);
-        $this->put('/transaction/1', ['amount'=>444.88],[]);
+        $this->patch('/transaction/1', ['amount'=>444.88]);
         $this->seeJsonStructure([
             'transactionId',
             'customerId',
             'amount',
             'date'
-
         ]);
+    }
+
+    public function testEditNonExistingTransaction()
+    {
+        $this->patch('/transaction/451', ['amount'=>444.88]);
+        $this->seeStatusCode(404);
+
+    }
+
+    /**
+     * @TODO  non 404 but 422 when invalid/missisng data
+    */
+    public function testEditTransactionWithBadData()
+    {
+        $this->patch('/transaction/451', ['amount'=>'ewqeqw']);
+        $this->seeStatusCode(404);
 
     }
 
