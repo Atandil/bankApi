@@ -36,7 +36,7 @@ class ApiTest extends TestCase
         $this->json('POST', '/customer', ['name' => 'Sally', 'cnp' => 123213123]);
         $this->seeStatusCode(200);
         $this->seeJson([
-                'customerId' => 6
+                'customerId' => 3
             ]);
 
     }
@@ -88,7 +88,6 @@ class ApiTest extends TestCase
     public function testAddTransaction()
     {
         $this->json('POST', '/transaction', ['customerId' => 1, 'amount'=>10.23]);
-        dd($this->response->getContent());
         $this->seeJsonStructure([
             'transactionId',
             'customerId',
@@ -97,7 +96,32 @@ class ApiTest extends TestCase
 
         ]);
 
+
+
     }
+
+    public function testAddTransactionMissingFields()
+    {
+        $this->json('POST', '/transaction', ['customerId' => 1]);
+        $this->seeStatusCode(422);
+
+    }
+
+    public function testBadAmount()
+    {
+        $this->json('POST', '/transaction', ['customerId' => 1, 'amount'=>'sadsad']);
+        $this->seeStatusCode(422);
+
+    }
+
+    public function testNonExistingCustomer()
+    {
+        $this->json('POST', '/transaction', ['customerId' => 434, 'amount'=>10.56]);
+        $this->seeStatusCode(422);
+
+    }
+
+
       /*
         ● updating a transaction:
         ○ Request: transactionId, amount
@@ -106,7 +130,6 @@ class ApiTest extends TestCase
     {
         //$this->json('PUT', '/transaction/1', ['amount'=>444.88]);
         $this->put('/transaction/1', ['amount'=>444.88],[]);
-        dd($this->response->getContent());
         $this->seeJsonStructure([
             'transactionId',
             'customerId',
