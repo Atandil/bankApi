@@ -14,3 +14,20 @@
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
+
+/**
+ * Routes for resource customer
+ */
+//$router->get('customer/{id}', 'CustomersController@get');
+$router->post('customer', 'CustomersController@add');
+//$router->put('customer/{id}', 'CustomersController@put');
+//$router->delete('customer/{id}', 'CustomersController@remove');
+
+/**
+ * Routes for resource transaction
+ */
+$router->get('transaction/{customerId}/{transactionId}', 'TransactionsController@get');
+$router->get('transaction/{customerId}/{date}/{offset}/{limit}', 'TransactionsController@getFilter');
+$router->post('transaction', 'TransactionsController@add');
+$router->put('transaction/{transactionId}', 'TransactionsController@put');
+$router->delete('transaction/{transactionId}', 'TransactionsController@remove');

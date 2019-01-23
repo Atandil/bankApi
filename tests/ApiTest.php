@@ -9,7 +9,17 @@ class ApiTest extends TestCase
      * @return void
      */
 
+    public function setUp()
+    {
+        parent::setUp();
+        $this->artisan('migrate');
+        //$this->artisan('db:seed');
+    }
 
+    public function tearDown()
+    {
+        $this->artisan('migrate:reset');
+    }
 
 
     /*
@@ -19,10 +29,15 @@ class ApiTest extends TestCase
     */
     public function testAddCustomer()
     {
-        $this->json('POST', '/customer', ['name' => 'Sally', 'cnp' => 123213123])
-            ->seeJson([
-                'created' => true,
+        $this->json('POST', '/customer', ['name' => 'Sally', 'cnp' => 123213123]);
+        $this->seeStatusCode(200);
+
+        //dd($this->response->getContent());
+
+        $this->seeJson([
+                'customerId' => 1
             ]);
+
     }
 
       /* ● getting a transaction:
