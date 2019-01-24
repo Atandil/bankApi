@@ -1,5 +1,6 @@
 <?php
 use App\Transaction;
+use App\User;
 
 class ApiTest extends TestCase
 {
@@ -28,6 +29,10 @@ class ApiTest extends TestCase
     */
     public function testAddCustomer()
     {
+        $user = factory(User::class)->create();
+        // authenticate
+        //$user->withAccessToken(new Token(['scopes' => ['*']]));
+        $this->actingAs($user, 'jwt.auth');
         $this->json('POST', '/customer', ['name' => 'Sally', 'cnp' => 123213123]);
         $this->seeStatusCode(200);
         $this->seeJson([

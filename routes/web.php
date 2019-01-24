@@ -15,13 +15,22 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-/**
- * Routes for resource customer
+/*
+ * login
  */
-//$router->get('customer/{id}', 'CustomersController@get');
-$router->post('customer', 'CustomersController@add');
-//$router->put('customer/{id}', 'CustomersController@put');
-//$router->delete('customer/{id}', 'CustomersController@remove');
+$router->post(
+    'auth/login',
+    [
+        'uses' => 'AuthController@authenticate'
+    ]
+);
+
+
+$router->group(
+    ['middleware' => 'jwt.auth'],
+    function() use ($router) {
+        $router->post('customer', 'CustomersController@add');
+    });
 
 /**
  * Routes for resource transaction

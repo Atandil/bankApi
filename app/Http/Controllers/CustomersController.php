@@ -10,7 +10,8 @@ use Illuminate\Http\Response;
  *
  * @package App\Http\Controllers
  */
-class CustomersController extends Controller {
+class CustomersController extends Controller
+{
 
     /**
      * @param Request $request
@@ -20,10 +21,18 @@ class CustomersController extends Controller {
      */
     public function add(Request $request)
     {
-        $this->validate($request, Customer::$rules);
-        $customer=Customer::create($request->all());
-        return response()->json(array('customerId' => $customer->id), 200);
+        try {
+            $this->validate($request, Customer::$rules);
+            $customer = Customer::create($request->all());
+
+            return response()->json(array('customerId' => $customer->id), 200);
+
+        } catch (\Exception $e) {
+            return response(
+                array('status' => $e->getMessage()),
+                421
+            );
+        }
 
     }
-
 }

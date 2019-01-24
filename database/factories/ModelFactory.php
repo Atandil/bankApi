@@ -40,3 +40,15 @@ $factory->define(App\Transaction::class, function (Faker\Generator $faker) {
         'customer_id' => $faker->randomElement($customers)
     ];
 });
+
+
+/**
+ * Factory for users
+ */
+$factory->define(App\User::class, function (Faker\Generator $faker) {
+    return [
+        'name'     => $faker->name,
+        'email'    => $faker->unique()->email,
+        'password' => bcrypt('password'),
+    ];
+});
