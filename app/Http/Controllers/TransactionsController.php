@@ -8,6 +8,12 @@ use App\Transaction;
 
 class TransactionsController extends Controller {
 
+    /**
+     * @param $customerId
+     * @param $transactionId
+     *
+     * @return \Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
+     */
     public function get($customerId,$transactionId)
     {
         try {
@@ -25,6 +31,11 @@ class TransactionsController extends Controller {
         );
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function add(Request $request)
     {
 
@@ -52,6 +63,12 @@ class TransactionsController extends Controller {
         return response()->json(self::jsonArray($transaction), $statusCode);
     }
 
+    /**
+     * @param Request $request
+     * @param         $transactionId
+     *
+     * @return \Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
+     */
     public function updateAmount(Request $request, $transactionId)
     {
         try {
@@ -71,6 +88,11 @@ class TransactionsController extends Controller {
         );
     }
 
+    /**
+     * @param $transactionId
+     *
+     * @return \Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
+     */
     public function remove($transactionId)
     {
         try {
@@ -87,7 +109,11 @@ class TransactionsController extends Controller {
     }
 
 
-
+    /**
+     * @param Request $request
+     *
+     * @return \Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
+     */
     public function getFilter(Request $request)
     {
 
@@ -124,6 +150,14 @@ class TransactionsController extends Controller {
 
     }
 
+    /**
+     * Function to tranform data
+     * @TODO  Change to league/fractal
+     *
+     * @param $transaction
+     *
+     * @return array
+     */
     protected static function jsonArray($transaction) {
         if (!is_object($transaction))
         {

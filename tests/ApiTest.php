@@ -3,11 +3,6 @@ use App\Transaction;
 
 class ApiTest extends TestCase
 {
-    /**
-     * A basic test example.
-     *
-     * @return void
-     */
 
     public function setUp()
     {
