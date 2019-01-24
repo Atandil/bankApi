@@ -35,18 +35,16 @@ $router->group(
 /**
  * Routes for resource transaction
  */
-//Retrieve information GET
-$router->get('transaction/{customerId}/{transactionId}', 'TransactionsController@get');;
-//$router->get('transaction/{customerId}/{date}/{offset}/{limit}', 'TransactionsController@getFilter');
-$router->get('transaction', 'TransactionsController@getFilter');
+$router->group(
+    ['prefix' => 'transaction','middleware' => 'jwt.auth'],
+    function() use ($router) {
+        $router->get('{customerId}/{transactionId}', 'TransactionsController@get');
+        $router->get('/', 'TransactionsController@getFilter');
+        $router->post('/', 'TransactionsController@add');
+        //change whole (or create) PUT
+        //change only one field PATCH  (can be not safe)
+        $router->patch('{transactionId}', 'TransactionsController@updateAmount');
+        $router->delete('{transactionId}', 'TransactionsController@remove');
+    });
 
-//Add NEW
-$router->post('transaction', 'TransactionsController@add');
-
-//change whole (or create) PUT
-//change only one field PATCH  (can be not safe)
-$router->patch('transaction/{transactionId}', 'TransactionsController@updateAmount');
-
-//remove entity DELETE
-$router->delete('transaction/{transactionId}', 'TransactionsController@remove');
 

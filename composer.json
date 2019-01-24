@@ -9,6 +9,7 @@
         "albertcht/lumen-helpers": "^0.6.0",
         "firebase/php-jwt": "^5.0",
         "laravel/lumen-framework": "5.7.*",
+        "league/flysystem": "^1.0",
         "symfony/yaml": "^4.2",
         "vlucas/phpdotenv": "~2.2",
         "wn/lumen-generators": "^1.3"
