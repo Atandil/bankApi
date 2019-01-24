@@ -16,6 +16,20 @@ $router->get('/', function () use ($router) {
 });
 
 /*
+ * GUI
+ */
+
+$router->group(
+    ['prefix' => 'gui','middleware' => 'BasicAuth'],
+    function() use ($router) {
+        $router->get('/', 'GuiController@index');
+        $router->get('json', 'GuiController@json');
+    });
+
+
+
+
+/*
  * login
  */
 $router->post(
