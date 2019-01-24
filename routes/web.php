@@ -29,6 +29,7 @@ $router->post('customer', 'CustomersController@add');
 //Retrieve information GET
 $router->get('transaction/{customerId}/{transactionId}', 'TransactionsController@get');;
 //$router->get('transaction/{customerId}/{date}/{offset}/{limit}', 'TransactionsController@getFilter');
+$router->get('transaction', 'TransactionsController@getFilter');
 
 //Add NEW
 $router->post('transaction', 'TransactionsController@add');

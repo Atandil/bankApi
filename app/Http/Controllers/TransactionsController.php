@@ -88,22 +88,40 @@ class TransactionsController extends Controller {
 
 
 
-    public function getFilter(Request $request, $customerId)
+    public function getFilter(Request $request)
     {
 
         try {
-            $transaction = Transaction::where('customer_id',$customerId)->get();
-            //$out['transactionId'] = $transaction->id;
-            //$out['amount'] = $transaction->amount;
-            //$out['date'] = $transaction->date->format('d.m.Y');;
+                $transactions = Transaction::when($request->has('customerId'), function ($query) use ($request) {
+                        return $query->where('customer_id',$request->input('customerId'));
+                    })
+                    ->when($request->has('amount'), function ($query) use ($request) {
+                        return $query->whereAmount($request->input('amount'));
+                    })
+                    ->when($request->has('date'), function ($query) use ($request) {
+                        return $query->where('date',$request->input('date'));
+                    })
+                    ->when($request->has('offset'), function ($query) use ($request) {
+                        return $query->offset($request->input('offset'));
+                    })
+                    ->when($request->has('limit'), function ($query) use ($request) {
+                        return $query->limit($request->input('limit'));
+                    })
+                    ->get();
+
+            $out=collect($transactions)->map(function($x){ return  self::jsonArray($x); })->toArray();
+
+            return response(
+
+                $out,  count($out) ? 201 : 404
+            );
+
         } catch (\Exception $e) {
-            $transaction = $e->getMessage();
-            $out=null;
-            $statusCode = 404;
+            return response(
+                array('status'=>$e->getMessage()),  404
+            );
         }
-        return response(
-            self::jsonArray($transaction), $statusCode ?? 201
-        );
+
     }
 
     protected static function jsonArray($transaction) {

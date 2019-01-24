@@ -13,10 +13,10 @@ class ApiTest extends TestCase
     {
         parent::setUp();
         $this->artisan('migrate');
-        Transaction::create(['customer_id'=>1,'date'=>'2019-01-02','amount'=>10.53]);
-        Transaction::create(['customer_id'=>1,'date'=>'2019-01-02','amount'=>10.53]);
-        Transaction::create(['customer_id'=>1,'date'=>'2019-01-03','amount'=>10.53]);
-        Transaction::create(['customer_id'=>1,'date'=>'2019-01-02','amount'=>110.53]);
+        Transaction::create(['customer_id'=>1,'date'=>'02.01.2019','amount'=>10.53]);
+        Transaction::create(['customer_id'=>1,'date'=>'02.01.2019','amount'=>10.53]);
+        Transaction::create(['customer_id'=>1,'date'=>'03.01.2019','amount'=>10.53]);
+        Transaction::create(['customer_id'=>1,'date'=>'02.01.2019','amount'=>110.53]);
         $this->artisan('db:seed');
     }
 
@@ -54,11 +54,8 @@ class ApiTest extends TestCase
             'transactionId',
             'amount',
             'date'
-
         ]);
-
-
-    }
+     }
 
       /*
         ● getting transaction by filters:
@@ -69,16 +66,9 @@ class ApiTest extends TestCase
 
     public function testGetFilteredTransactions()
     {
-        $this->json('GET', '/transaction/filter/1',['amount'=>'10.53','date'=>'2019-01-02','offset'=>0,'limit'=>2]);
-        dd($this->response->getContent());
+        $this->json('GET', '/transaction',['customerId'=>1,'amount'=>10.53,'date'=>'02.01.2019','offset'=>0,'limit'=>2]);
+        $this->seeStatusCode(201);
 
-       // $this->seeStatusCode(201);
-        /*$this->seeJsonStructure([
-            'transactionId',
-            'amount',
-            'date'
-
-        ]);*/
 
 
     }
@@ -93,11 +83,7 @@ class ApiTest extends TestCase
             'customerId',
             'amount',
             'date'
-
         ]);
-
-
-
     }
 
     public function testAddTransactionMissingFields()
@@ -107,14 +93,17 @@ class ApiTest extends TestCase
 
     }
 
-    public function testBadAmount()
+    public function testAddTransactionBadAmount()
     {
         $this->json('POST', '/transaction', ['customerId' => 1, 'amount'=>'sadsad']);
         $this->seeStatusCode(422);
 
     }
 
-    public function testNonExistingCustomer()
+    /**
+     * @TODO   should be 404
+     */
+    public function testAddTransactionNonExistingCustomer()
     {
         $this->json('POST', '/transaction', ['customerId' => 434, 'amount'=>10.56]);
         $this->seeStatusCode(422);
@@ -159,4 +148,19 @@ class ApiTest extends TestCase
         ○ Request: trasactionId
         ○ Response: success/fail
      */
+    public function testDeleteTransaction()
+    {
+        $this->delete('/transaction/2');
+        $this->seeStatusCode(200);
+
+    }
+
+    public function testDeleteNonExistingTransaction()
+    {
+        $this->delete('/transaction/4235');
+        $this->seeStatusCode(404);
+
+    }
+
+
 }
