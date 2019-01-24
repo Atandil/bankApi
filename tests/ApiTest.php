@@ -1,9 +1,12 @@
 <?php
 use App\Transaction;
 use App\User;
+use Firebase\JWT\JWT;
 
 class ApiTest extends TestCase
 {
+
+    private $token;
 
     public function setUp()
     {
@@ -14,6 +17,11 @@ class ApiTest extends TestCase
         Transaction::create(['customer_id'=>1,'date'=>'03.01.2019','amount'=>10.53]);
         Transaction::create(['customer_id'=>1,'date'=>'02.01.2019','amount'=>110.53]);
         $this->artisan('db:seed');
+
+        //auth token
+        $user=User::find(1);
+        $this->token=$this->jwtToken($user);
+
     }
 
     public function tearDown()
@@ -29,11 +37,8 @@ class ApiTest extends TestCase
     */
     public function testAddCustomer()
     {
-        $user = factory(User::class)->create();
-        // authenticate
-        //$user->withAccessToken(new Token(['scopes' => ['*']]));
-        $this->actingAs($user, 'jwt.auth');
-        $this->json('POST', '/customer', ['name' => 'Sally', 'cnp' => 123213123]);
+        $this->json('POST', '/customer', ['name' => 'Sally', 'cnp' => 123213123],
+            ['HTTP_Authorization' => 'Bearer ' . $this->token]);
         $this->seeStatusCode(200);
         $this->seeJson([
                 'customerId' => 3
@@ -48,7 +53,8 @@ class ApiTest extends TestCase
 
     public function testGetTransaction()
     {
-        $this->json('GET', '/transaction/1/1');
+        $this->json('GET', '/transaction/1/1',
+            ['HTTP_Authorization' => 'Bearer ' . $this->token]);
         $this->seeStatusCode(201);
         $this->seeJsonStructure([
             'transactionId',
@@ -66,7 +72,8 @@ class ApiTest extends TestCase
 
     public function testGetFilteredTransactions()
     {
-        $this->json('GET', '/transaction',['customerId'=>1,'amount'=>10.53,'date'=>'02.01.2019','offset'=>0,'limit'=>2]);
+        $this->json('GET', '/transaction',['customerId'=>1,'amount'=>10.53,'date'=>'02.01.2019','offset'=>0,'limit'=>2],
+            ['HTTP_Authorization' => 'Bearer ' . $this->token]);
         $this->seeStatusCode(201);
 
 
@@ -77,7 +84,8 @@ class ApiTest extends TestCase
         ○ Response: transactionId, customerId, amount, date*/
     public function testAddTransaction()
     {
-        $this->json('POST', '/transaction', ['customerId' => 1, 'amount'=>10.23]);
+        $this->json('POST', '/transaction', ['customerId' => 1, 'amount'=>10.23],
+            ['HTTP_Authorization' => 'Bearer ' . $this->token]);
         $this->seeJsonStructure([
             'transactionId',
             'customerId',
@@ -88,14 +96,16 @@ class ApiTest extends TestCase
 
     public function testAddTransactionMissingFields()
     {
-        $this->json('POST', '/transaction', ['customerId' => 1]);
+        $this->json('POST', '/transaction', ['customerId' => 1],
+            ['HTTP_Authorization' => 'Bearer ' . $this->token]);
         $this->seeStatusCode(422);
 
     }
 
     public function testAddTransactionBadAmount()
     {
-        $this->json('POST', '/transaction', ['customerId' => 1, 'amount'=>'sadsad']);
+        $this->json('POST', '/transaction', ['customerId' => 1, 'amount'=>'sadsad'],
+            ['HTTP_Authorization' => 'Bearer ' . $this->token]);
         $this->seeStatusCode(422);
 
     }
@@ -105,7 +115,8 @@ class ApiTest extends TestCase
      */
     public function testAddTransactionNonExistingCustomer()
     {
-        $this->json('POST', '/transaction', ['customerId' => 434, 'amount'=>10.56]);
+        $this->json('POST', '/transaction', ['customerId' => 434, 'amount'=>10.56],
+            ['HTTP_Authorization' => 'Bearer ' . $this->token]);
         $this->seeStatusCode(422);
 
     }
@@ -117,8 +128,9 @@ class ApiTest extends TestCase
         ○ Response: transactionId, customerId, amount, date*/
     public function testEditTransaction()
     {
-        //$this->json('PUT', '/transaction/1', ['amount'=>444.88]);
-        $this->patch('/transaction/1', ['amount'=>444.88]);
+        $this->json('PATCH', '/transaction/1', ['amount'=>444.88],
+            ['HTTP_Authorization' => 'Bearer ' . $this->token]);
+        //$this->patch('/transaction/1', ['amount'=>444.88]);
         $this->seeJsonStructure([
             'transactionId',
             'customerId',
@@ -129,7 +141,8 @@ class ApiTest extends TestCase
 
     public function testEditNonExistingTransaction()
     {
-        $this->patch('/transaction/451', ['amount'=>444.88]);
+        $this->json('PATCH','/transaction/451', ['amount'=>444.88],
+            ['HTTP_Authorization' => 'Bearer ' . $this->token]);
         $this->seeStatusCode(404);
 
     }
@@ -139,7 +152,8 @@ class ApiTest extends TestCase
     */
     public function testEditTransactionWithBadData()
     {
-        $this->patch('/transaction/451', ['amount'=>'ewqeqw']);
+        $this->json('PATCH','/transaction/451', ['amount'=>'ewqeqw'],
+            ['HTTP_Authorization' => 'Bearer ' . $this->token]);
         $this->seeStatusCode(404);
 
     }
@@ -150,16 +164,31 @@ class ApiTest extends TestCase
      */
     public function testDeleteTransaction()
     {
-        $this->delete('/transaction/2');
+       $this->delete('/transaction/2',[],
+            ['HTTP_Authorization' => 'Bearer ' . $this->token]);
         $this->seeStatusCode(200);
 
     }
 
     public function testDeleteNonExistingTransaction()
     {
-        $this->delete('/transaction/4235');
+        $this->delete('/transaction/4235',[],
+            ['HTTP_Authorization' => 'Bearer ' . $this->token]);
         $this->seeStatusCode(404);
 
+    }
+
+    protected function jwtToken(User $user) {
+        $payload = [
+            'iss' => "lumen-jwt", // Issuer of the token
+            'sub' => $user->id, // Subject of the token
+            'iat' => time(), // Time when JWT was issued.
+            'exp' => time() + 60*60 // Expiration time
+        ];
+
+        // As you can see we are passing `JWT_SECRET` as the second parameter that will
+        // be used to decode the token in the future.
+        return JWT::encode($payload, env('JWT_SECRET'));
     }
 
 
